@@ -45,6 +45,7 @@ The application will be running at `http://localhost:3000`.
 5. Click **Run Semantic Search** and view the locally generated XAI match reports.
 
 ## 👥 Team
-* [Your Name] - Architect & AI/ML Engineer
-* [Team Member 2] - Full Stack Developer
-* [Team Member 3] - UI/UX Designer
+* Shivani Rao
+* Sanika Jadhav
+* Vishal Patil
+* Bhakti Desale
