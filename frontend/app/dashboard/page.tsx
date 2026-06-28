@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+import { useRouter } from "next/navigation";
+
+
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,25 +13,17 @@ import { Upload, Play, CheckCircle2, XCircle, BrainCircuit, FileText, ChevronRig
 import { api } from "../../lib/api"; // Note: Adjusted to relative path based on your folder structure
 
 export default function DashboardPage() {
-  
+  const router = useRouter();
+
+useEffect(() => {
+  const token = localStorage.getItem("access_token");
+
+  if (!token) {
+    router.push("/login");
+  }
+}, [router]);
   // --- INVISIBLE HACKATHON AUTO-LOGIN ---
-  useEffect(() => {
-    const autoLogin = async () => {
-      if (!localStorage.getItem('access_token')) {
-        try {
-          const res = await api.post('/auth/login', {
-            email: "judge@hackathon.com",
-            password: "securepassword123"
-          });
-          localStorage.setItem('access_token', res.data.access_token);
-          window.location.reload(); // Refresh once to load the new token
-        } catch (error) {
-          console.error("Auto-login failed:", error);
-        }
-      }
-    };
-    autoLogin();
-  }, []);
+
   // --------------------------------------
 
   const queryClient = useQueryClient();
