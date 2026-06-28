@@ -18,6 +18,10 @@ export default function DashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+const [authEmail, setAuthEmail] = useState("demo@recruitiq.ai");
+const [authPassword, setAuthPassword] = useState("securepassword123");
+const [authLoading, setAuthLoading] = useState(false);
 
   // Job Form State
   const [jobTitle, setJobTitle] = useState("");
@@ -31,10 +35,44 @@ export default function DashboardPage() {
     }
   }, []);
 
-  function handleEnterDashboard() {
-    localStorage.setItem("access_token", "demo-token");
+  async function handleAuthSubmit(e: React.FormEvent) {
+  e.preventDefault();
+
+  try {
+    setAuthLoading(true);
+
+    if (authMode === "register") {
+      await api.post("/auth/register", {
+        email: authEmail,
+        password: authPassword,
+      });
+    }
+
+    const res = await api.post("/auth/login", {
+      email: authEmail,
+      password: authPassword,
+    });
+
+    const token = res.data.access_token || res.data.token;
+
+    if (!token) {
+      throw new Error("No token received from backend");
+    }
+
+    localStorage.setItem("access_token", token);
     setIsAuthenticated(true);
+  } catch (error: any) {
+    console.error("Auth failed:", error?.response?.data || error);
+
+    alert(
+      authMode === "register"
+        ? "Register/Login failed. Check backend register endpoint or credentials."
+        : "Login failed. Check email/password."
+    );
+  } finally {
+    setAuthLoading(false);
   }
+}
 
   function handleLogout() {
     localStorage.removeItem("access_token");
@@ -146,7 +184,7 @@ export default function DashboardPage() {
 
             <div className="flex items-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-sm text-gray-300">
               <span className="text-emerald-400">◎</span>
-              SQLite portable demo
+              SQLite/PostgreSQL portable demo
             </div>
 
             <div className="flex items-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-sm text-gray-300">
@@ -158,20 +196,44 @@ export default function DashboardPage() {
 
         {/* RIGHT SIDE AUTH CARD */}
         <section className="flex justify-center">
-          <div className="w-full max-w-md bg-[#0b1020]/90 border border-white/10 rounded-xl p-6 shadow-2xl backdrop-blur">
+          <form
+            onSubmit={handleAuthSubmit}
+            className="w-full max-w-md bg-[#0b1020]/90 border border-white/10 rounded-xl p-6 shadow-2xl backdrop-blur"
+          >
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-2xl font-bold">Welcome back</h2>
+                <h2 className="text-2xl font-bold">
+                  {authMode === "login" ? "Welcome back" : "Create account"}
+                </h2>
                 <p className="text-xs text-gray-400 mt-1">
-                  Secure recruiter access
+                  {authMode === "login"
+                    ? "Secure recruiter access"
+                    : "Register recruiter workspace"}
                 </p>
               </div>
 
               <div className="flex rounded-md border border-white/10 overflow-hidden text-xs">
-                <button className="px-3 py-2 bg-white text-black font-medium">
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("login")}
+                  className={`px-3 py-2 font-medium ${
+                    authMode === "login"
+                      ? "bg-white text-black"
+                      : "bg-transparent text-gray-300 hover:bg-white/10"
+                  }`}
+                >
                   Login
                 </button>
-                <button className="px-3 py-2 bg-transparent text-gray-300 hover:bg-white/10">
+
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("register")}
+                  className={`px-3 py-2 font-medium ${
+                    authMode === "register"
+                      ? "bg-white text-black"
+                      : "bg-transparent text-gray-300 hover:bg-white/10"
+                  }`}
+                >
                   Register
                 </button>
               </div>
@@ -180,31 +242,40 @@ export default function DashboardPage() {
             <div className="space-y-4">
               <input
                 type="email"
-                defaultValue="demo@recruitiq.ai"
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
                 className="w-full bg-black/60 border border-white/10 rounded-md px-3 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
                 placeholder="Email address"
+                required
               />
 
               <input
                 type="password"
-                defaultValue="securepassword123"
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
                 className="w-full bg-black/60 border border-white/10 rounded-md px-3 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
                 placeholder="Password"
+                required
               />
 
               <button
-                onClick={handleEnterDashboard}
-                className="w-full bg-white text-black font-semibold py-3 rounded-md hover:bg-gray-200 transition"
+                type="submit"
+                disabled={authLoading}
+                className="w-full bg-white text-black font-semibold py-3 rounded-md hover:bg-gray-200 transition disabled:opacity-60"
               >
-                Enter dashboard →
+                {authLoading
+                  ? "Please wait..."
+                  : authMode === "login"
+                  ? "Enter dashboard →"
+                  : "Register & enter →"}
               </button>
             </div>
-          </div>
+          </form>
         </section>
       </div>
     </main>
   );
-} 
+}
 
   return (
     <div className="max-w-7xl mx-auto p-6 grid grid-cols-12 gap-8 h-screen pt-12">
