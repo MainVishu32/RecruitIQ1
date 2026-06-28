@@ -105,47 +105,106 @@ export default function DashboardPage() {
     },
   });
 
-  if (!isAuthenticated) {
-    return (
-      <main className="min-h-screen bg-black text-white grid grid-cols-1 md:grid-cols-2">
-        <section className="flex flex-col justify-center px-10 md:px-20 bg-gradient-to-br from-black via-[#0b1120] to-black">
-          <div className="flex items-center gap-3 mb-6">
-            <BrainCircuit className="text-blue-500" size={36} />
-            <h1 className="text-4xl font-bold">RecruitIQ</h1>
+ if (!isAuthenticated) {
+  return (
+    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6 overflow-hidden relative">
+      {/* Background glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(14,165,233,0.18),transparent_35%),radial-gradient(circle_at_80%_50%,rgba(168,85,247,0.12),transparent_35%)]" />
+      <div className="absolute inset-0 bg-black/60" />
+
+      <div className="relative z-10 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+        {/* LEFT SIDE */}
+        <section>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-300 mb-6">
+            <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+            INDIA RUNS 2026 TRACK 1
           </div>
 
-          <h2 className="text-5xl font-bold leading-tight mb-4">
-            Semantic Hiring Intelligence
-          </h2>
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">
+            RecruitIQ
+          </h1>
 
-          <p className="text-gray-400 text-lg max-w-md">
-            Upload job descriptions, ingest candidate datasets, and discover
-            best-fit profiles using intelligent matching.
+          <p className="text-gray-300 text-lg mb-6">
+            Beyond Keywords. Intelligent Hiring.
           </p>
-        </section>
 
-        <section className="flex items-center justify-center p-8">
-          <div className="w-full max-w-md bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl">
-            <h2 className="text-3xl font-bold mb-2">Welcome back</h2>
-            <p className="text-gray-400 mb-8">
-              Continue to your RecruitIQ workspace.
-            </p>
+          <p className="text-gray-400 max-w-xl text-sm leading-relaxed mb-8">
+            Upload a job description and candidate CSV, then rank talent through
+            semantic embeddings, structured evidence, and explainable AI.
+          </p>
 
-            <button
-              onClick={handleEnterDashboard}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition"
-            >
-              Enter Dashboard
-            </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-sm text-gray-300">
+              <span className="text-emerald-400">◎</span>
+              BGE semantic embeddings
+            </div>
 
-            <p className="text-xs text-gray-500 mt-4 text-center">
-              Prototype demo login enabled.
-            </p>
+            <div className="flex items-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-sm text-gray-300">
+              <span className="text-emerald-400">◎</span>
+              Explainable ranking evidence
+            </div>
+
+            <div className="flex items-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-sm text-gray-300">
+              <span className="text-emerald-400">◎</span>
+              SQLite portable demo
+            </div>
+
+            <div className="flex items-center gap-2 px-4 py-3 rounded-md bg-white/5 border border-white/10 text-sm text-gray-300">
+              <span className="text-emerald-400">◎</span>
+              JWT-secured workflow
+            </div>
           </div>
         </section>
-      </main>
-    );
-  }
+
+        {/* RIGHT SIDE AUTH CARD */}
+        <section className="flex justify-center">
+          <div className="w-full max-w-md bg-[#0b1020]/90 border border-white/10 rounded-xl p-6 shadow-2xl backdrop-blur">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h2 className="text-2xl font-bold">Welcome back</h2>
+                <p className="text-xs text-gray-400 mt-1">
+                  Secure recruiter access
+                </p>
+              </div>
+
+              <div className="flex rounded-md border border-white/10 overflow-hidden text-xs">
+                <button className="px-3 py-2 bg-white text-black font-medium">
+                  Login
+                </button>
+                <button className="px-3 py-2 bg-transparent text-gray-300 hover:bg-white/10">
+                  Register
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <input
+                type="email"
+                defaultValue="demo@recruitiq.ai"
+                className="w-full bg-black/60 border border-white/10 rounded-md px-3 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                placeholder="Email address"
+              />
+
+              <input
+                type="password"
+                defaultValue="securepassword123"
+                className="w-full bg-black/60 border border-white/10 rounded-md px-3 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                placeholder="Password"
+              />
+
+              <button
+                onClick={handleEnterDashboard}
+                className="w-full bg-white text-black font-semibold py-3 rounded-md hover:bg-gray-200 transition"
+              >
+                Enter dashboard →
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+} 
 
   return (
     <div className="max-w-7xl mx-auto p-6 grid grid-cols-12 gap-8 h-screen pt-12">
