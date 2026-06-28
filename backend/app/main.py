@@ -33,3 +33,7 @@ app.include_router(analytics.router)  # <--- Add this
 @app.get("/health")
 def health_check():
     return {"status": "operational", "system": "RecruitIQ Backend"}
+
+@app.get("/")
+def home():
+    return {"message": "RecruitIQ backend is live"}
