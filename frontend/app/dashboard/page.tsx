@@ -19,8 +19,8 @@ export default function DashboardPage() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
-const [authEmail, setAuthEmail] = useState("demo@recruitiq.ai");
-const [authPassword, setAuthPassword] = useState("securepassword123");
+const [authEmail, setAuthEmail] = useState("");
+const [authPassword, setAuthPassword] = useState("");
 const [authLoading, setAuthLoading] = useState(false);
 
   // Job Form State
@@ -35,25 +35,57 @@ const [authLoading, setAuthLoading] = useState(false);
     }
   }, []);
 
-  async function handleAuthSubmit(e: React.FormEvent) {
+async function handleAuthSubmit(e: React.FormEvent) {
   e.preventDefault();
 
   try {
     setAuthLoading(true);
 
+    // 1) REGISTER only if Register tab selected
     if (authMode === "register") {
-      await api.post("/auth/register", {
+      try {
+        await api.post("/auth/register", {
+          email: authEmail,
+          password: authPassword,
+        });
+      } catch (registerError: any) {
+        console.log("Register failed:", registerError?.response?.data);
+
+        // If user already exists, continue to login
+        const status = registerError?.response?.status;
+
+        if (status !== 400 && status !== 409) {
+          throw registerError;
+        }
+      }
+    }
+
+    // 2) LOGIN using JSON first
+    let token = "";
+
+    try {
+      const loginRes = await api.post("/auth/login", {
         email: authEmail,
         password: authPassword,
       });
+
+      token = loginRes.data.access_token || loginRes.data.token;
+    } catch (jsonLoginError) {
+      console.log("JSON login failed, trying form login...");
+
+      // 3) LOGIN using form-data fallback
+      const formData = new URLSearchParams();
+      formData.append("username", authEmail);
+      formData.append("password", authPassword);
+
+      const formLoginRes = await api.post("/auth/login", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      token = formLoginRes.data.access_token || formLoginRes.data.token;
     }
-
-    const res = await api.post("/auth/login", {
-      email: authEmail,
-      password: authPassword,
-    });
-
-    const token = res.data.access_token || res.data.token;
 
     if (!token) {
       throw new Error("No token received from backend");
@@ -65,9 +97,7 @@ const [authLoading, setAuthLoading] = useState(false);
     console.error("Auth failed:", error?.response?.data || error);
 
     alert(
-      authMode === "register"
-        ? "Register/Login failed. Check backend register endpoint or credentials."
-        : "Login failed. Check email/password."
+      "Login/Register failed. Try Register with a new email, or check backend /auth routes."
     );
   } finally {
     setAuthLoading(false);
