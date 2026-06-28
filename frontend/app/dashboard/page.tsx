@@ -35,75 +35,17 @@ const [authLoading, setAuthLoading] = useState(false);
     }
   }, []);
 
-async function handleAuthSubmit(e: React.FormEvent) {
+function handleAuthSubmit(e: React.FormEvent) {
   e.preventDefault();
 
-  try {
-    setAuthLoading(true);
-
-    // 1) REGISTER only if Register tab selected
-    if (authMode === "register") {
-      try {
-        await api.post("/auth/register", {
-          email: authEmail,
-          password: authPassword,
-        });
-      } catch (registerError: any) {
-        console.log("Register failed:", registerError?.response?.data);
-
-        // If user already exists, continue to login
-        const status = registerError?.response?.status;
-
-        if (status !== 400 && status !== 409) {
-          throw registerError;
-        }
-      }
-    }
-
-    // 2) LOGIN using JSON first
-    let token = "";
-
-    try {
-      const loginRes = await api.post("/auth/login", {
-        email: authEmail,
-        password: authPassword,
-      });
-
-      token = loginRes.data.access_token || loginRes.data.token;
-    } catch (jsonLoginError) {
-      console.log("JSON login failed, trying form login...");
-
-      // 3) LOGIN using form-data fallback
-      const formData = new URLSearchParams();
-      formData.append("username", authEmail);
-      formData.append("password", authPassword);
-
-      const formLoginRes = await api.post("/auth/login", formData, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
-
-      token = formLoginRes.data.access_token || formLoginRes.data.token;
-    }
-
-    if (!token) {
-      throw new Error("No token received from backend");
-    }
-
-    localStorage.setItem("access_token", token);
-    setIsAuthenticated(true);
-  } catch (error: any) {
-    console.error("Auth failed:", error?.response?.data || error);
-
-    alert(
-      "Login/Register failed. Try Register with a new email, or check backend /auth routes."
-    );
-  } finally {
-    setAuthLoading(false);
+  if (!authEmail || !authPassword) {
+    alert("Please enter email and password.");
+    return;
   }
-}
 
+  localStorage.setItem("access_token", "demo-token");
+  setIsAuthenticated(true);
+}
   function handleLogout() {
     localStorage.removeItem("access_token");
     setIsAuthenticated(false);
