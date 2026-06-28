@@ -1,7 +1,8 @@
-// Change this line in frontend/lib/api.ts
+import axios from "axios";
+
 export const api = axios.create({
-  baseURL: 'http://localhost:8000', // Remove the /api/v1
+  baseURL: "https://recruitiq1.onrender.com",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
